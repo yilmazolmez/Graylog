@@ -1,4 +1,5 @@
 using Graylog.API.Filters;
+using Graylog.API.Middlewares;
 using Graylog.API.Modules;
 using NLog;
 
