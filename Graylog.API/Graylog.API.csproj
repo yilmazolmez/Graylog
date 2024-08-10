@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <Folder Include="Middlewares\" />
-    <Folder Include="Modules\" />
   </ItemGroup>
 
 </Project>

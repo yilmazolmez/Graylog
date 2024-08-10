@@ -1,4 +1,5 @@
 using Graylog.API.Filters;
+using Graylog.API.Modules;
 using NLog;
 
 var logger = LogManager.Setup().LoadConfigurationFromFile("Nlog.config").GetCurrentClassLogger();
