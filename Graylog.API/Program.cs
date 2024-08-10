@@ -1,3 +1,4 @@
+using Graylog.API.Filters;
 using NLog;
 
 var logger = LogManager.Setup().LoadConfigurationFromFile("Nlog.config").GetCurrentClassLogger();
@@ -6,9 +7,24 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    builder.Services.AddControllers();
+    builder.Services.AddControllers(config =>
+    {
+        config.Filters.Add<CustomExceptionFilter>();
+        config.Filters.Add<LogEventActionsFilter>();
+    }).AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = null;
+    });
+
     builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen();
+
+    #region Modules
+    builder.Services.AddSwaggerModule();
+    builder.Services.AddCommonModule();
+    builder.Services.AddApplicationModule();
+    builder.Services.AddLoggingModule();
+    #endregion
+
 
     var app = builder.Build();
 
@@ -19,7 +35,23 @@ try
     }
 
     app.UseHttpsRedirection();
+
+    #region Middlewares
+    app.UseMiddleware<TraceIdAndLoggerMiddleware>();
+    app.UseMiddleware<RequestAndResponseMiddleware>();
+    //app.UseExceptionMiddleware(); //Custom Exception Filter Kullanýlacaktýr
+    #endregion
+
     app.UseAuthorization();
+
+
+    #region CORS
+    app.UseCors(option => option.AllowAnyOrigin()
+                                .AllowAnyMethod()
+                                .AllowAnyHeader());
+    #endregion
+
+
     app.MapControllers();
 
     app.Run();
